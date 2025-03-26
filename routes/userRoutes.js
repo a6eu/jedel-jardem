@@ -3,7 +3,7 @@ const {
     getUsers,
     getUserById,
     updateUser,
-    deleteUser,
+    deleteUser, getMe,
 } = require('../controllers/userController')
 const authMiddleware = require('../middlewares/authMiddleware')
 
@@ -125,5 +125,7 @@ router.put('/:id', authMiddleware, updateUser)
  *         description: Server error
  */
 router.delete('/:id', authMiddleware, deleteUser)
+
+router.get('/me', authMiddleware, getMe)
 
 module.exports = router

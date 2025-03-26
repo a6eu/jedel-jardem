@@ -11,8 +11,8 @@ const options = {
         },
         servers: [
             {
-                url: 'https://jedel-jardem-production.up.railway.app', 
-            },
+                url: 'http://localhost:8080',
+            }
         ],
         components: {
             securitySchemes: {
@@ -23,7 +23,7 @@ const options = {
                 },
             },
         },
-        security: [{ bearerAuth: [] }],
+        security: [{bearerAuth: []}],
     },
     apis: ['./routes/*.js'],
 }
