@@ -18,14 +18,14 @@ const router = express.Router()
  *               - name
  *               - email
  *               - role
- *               - phoneNumber
+ *               - gender
  *               - password
  *             properties:
  *               name:
  *                 type: string
  *               role:
  *                  type: string
- *               phoneNumber:
+ *               gender:
  *                  type: string
  *               email:
  *                 type: string

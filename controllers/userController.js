@@ -38,51 +38,55 @@ exports.getUserById = async (req, res) => {
 }
 
 exports.updateUser = async (req, res) => {
-    try {
-        upload(req, res, async (err) => {
-            if (err)
-                return res.status(500).json({message: 'File upload error'})
+    upload(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({message: 'File upload error', error: err.message});
+        }
 
-            let avatarUrl
-            if (req.file) {
-                const file = bucket.file(
-                    `avatars/${Date.now()}-${req.file.originalname}`
-                )
-                await file.save(req.file.buffer, {
-                    contentType: req.file.mimetype,
-                })
-                avatarUrl = `https://storage.googleapis.com/${bucket.name}/${file.name}`
-            }
+        const userId = req.user?.id;
 
-            const {name, phoneNumber, role, specialisation, birthYear} =
-                req.body
+        if (!userId) {
+            return res.status(401).json({message: 'Unauthorized'});
+        }
 
+        const {
+            name,
+            role,
+            specialisation,
+            birthYear,
+            gender,
+        } = req.body;
+
+        try {
             const updatedUser = await User.findByIdAndUpdate(
-                req.params.id,
+                userId,
                 {
                     name,
-                    phoneNumber,
                     role,
                     specialisation,
                     birthYear,
-                    ...(avatarUrl && {avatarUrl}),
+                    gender,
                 },
                 {new: true, runValidators: true}
-            ).select('-password')
+            ).select('-password');
 
             if (!updatedUser) {
-                return res.status(404).json({message: 'User not found'})
+                return res.status(404).json({message: 'User not found'});
             }
 
-            res.json(updatedUser)
-        })
-    } catch (error) {
-        res.status(500).json({message: 'Server error', error: error.message})
-    }
-}
+            res.json(updatedUser);
+        } catch (error) {
+            res.status(500).json({message: 'Server error', error: error.message});
+        }
+    });
+};
 
 exports.deleteUser = async (req, res) => {
     try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({message: 'User not found'});
+        }
         await User.findByIdAndDelete(req.params.id)
         res.json({message: 'User deleted'})
     } catch (error) {

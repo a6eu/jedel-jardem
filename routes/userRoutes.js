@@ -59,19 +59,13 @@ router.get('/:id', authMiddleware, getUserById)
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users:
  *   put:
  *     summary: Update a user by ID
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The user ID
  *     requestBody:
  *       required: true
  *       content:
@@ -81,8 +75,8 @@ router.get('/:id', authMiddleware, getUserById)
  *             properties:
  *               name:
  *                 type: string
- *               phoneNumber:
- *                 type: string
+ *               gender:
+ *                  type: string
  *               role:
  *                 type: string
  *               specialisation:
@@ -101,11 +95,11 @@ router.get('/:id', authMiddleware, getUserById)
  *       500:
  *         description: Server error
  */
-router.put('/:id', authMiddleware, updateUser)
+router.put('', authMiddleware, updateUser)
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users:
  *   delete:
  *     summary: Delete a user by ID
  *     tags: [Users]
@@ -124,7 +118,7 @@ router.put('/:id', authMiddleware, updateUser)
  *       500:
  *         description: Server error
  */
-router.delete('/:id', authMiddleware, deleteUser)
+router.delete('', authMiddleware, deleteUser)
 
 router.get('/me', authMiddleware, getMe)
 
