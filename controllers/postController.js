@@ -32,7 +32,7 @@ exports.createPost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find()
-            .populate('author', 'name specialisation avatarUrl id email')
+            .populate('author', 'name role avatarUrl id email')
             .sort({createdAt: -1})
         res.json(posts)
     } catch (error) {
@@ -47,7 +47,7 @@ exports.getPostById = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate(
             'author',
-            'name specialisation avatarUrl email id'
+            'name role avatarUrl email id'
         )
         if (!post) return res.status(404).json({message: 'Post not found'})
         res.json(post)
@@ -98,7 +98,7 @@ exports.updatePost = async (req, res) => {
         post.images = images
 
         await post.save()
-        await post.populate('author', 'name specialisation avatarUrl email id')
+        await post.populate('author', 'name role avatarUrl email id')
 
         res.json({message: 'Post updated successfully', post})
     } catch (error) {

@@ -30,7 +30,7 @@ const router = express.Router()
  *       500:
  *         description: Server error
  */
-router.get('/', authMiddleware, getUsers)
+router.get('', authMiddleware, getMe)
 
 /**
  * @swagger
@@ -120,6 +120,8 @@ router.put('', authMiddleware, updateUser)
  */
 router.delete('', authMiddleware, deleteUser)
 
-router.get('/me', authMiddleware, getMe)
+router.get('/everyone', getUsers)
+
+// router.get('/me', authMiddleware, getMe)
 
 module.exports = router
