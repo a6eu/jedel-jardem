@@ -45,6 +45,7 @@ exports.updateUser = async (req, res) => {
         birthYear,
         gender,
         company,
+        phone,
         bio
     } = req.body;
 
@@ -58,6 +59,7 @@ exports.updateUser = async (req, res) => {
                 birthYear,
                 gender,
                 company,
+                phone,
                 bio
             },
             {new: true, runValidators: true}
