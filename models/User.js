@@ -22,8 +22,8 @@ const UserSchema = new mongoose.Schema(
                 type: String
             }],
             allergies: [{type: String}]
-        }
-
+        },
+        reviews: [{type: Number}]
     },
     {timestamps: true}
 )

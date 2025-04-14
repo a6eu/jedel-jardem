@@ -89,3 +89,38 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({message: 'Server error'})
     }
 }
+
+exports.reviewUser = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({message: 'User not found'});
+        }
+
+        const {doctorId, review} = req.body;
+
+        if (!doctorId || !review) {
+            return res.status(400).json({message: 'Doctor ID and review are required'});
+        }
+
+        if (!updatedDoctor) {
+            return res.status(404).json({message: 'Doctor not found'});
+        }
+
+        res.json(updatedDoctor);
+
+        const updatedDoctor = await User.findByIdAndUpdate(
+            doctorId,
+            {$push: {reviews: review}},
+            {new: true}
+        ).select('-password');
+
+        if (!updatedDoctor) {
+            return res.status(404).json({message: 'Doctor not found'});
+        }
+
+        res.json(updatedDoctor);
+    } catch (e) {
+        res.status(500).json({message: 'Server error'}, e.message);
+    }
+}
