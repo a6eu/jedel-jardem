@@ -103,12 +103,6 @@ exports.reviewUser = async (req, res) => {
             return res.status(400).json({message: 'Doctor ID and review are required'});
         }
 
-        if (!updatedDoctor) {
-            return res.status(404).json({message: 'Doctor not found'});
-        }
-
-        res.json(updatedDoctor);
-
         const updatedDoctor = await User.findByIdAndUpdate(
             doctorId,
             {$push: {reviews: review}},
