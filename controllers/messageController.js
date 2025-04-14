@@ -2,13 +2,14 @@ const Message = require('../models/Message');
 const Chat = require('../models/Chat');
 
 exports.sendMessage = async (req, res) => {
-    const {chatId, text} = req.body;
+    const {chatId, text, files} = req.body;
 
     try {
         const message = await Message.create({
             chat: chatId,
             sender: req.user.id,
             text,
+            files,
         });
 
         await Chat.findByIdAndUpdate(
