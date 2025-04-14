@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema(
         role: {type: String, required: true},
         gender: {type: String, required: true},
         specialisation: {type: String},
-        location: {type: String},
+        location: {type: String, required: true},
         phone: {type: String},
         birthYear: {type: Date},
         avatarUrl: {type: String},
