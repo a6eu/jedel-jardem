@@ -46,7 +46,8 @@ exports.updateUser = async (req, res) => {
         gender,
         company,
         phone,
-        bio
+        bio,
+        patientData
     } = req.body;
 
     try {
@@ -60,7 +61,8 @@ exports.updateUser = async (req, res) => {
                 gender,
                 company,
                 phone,
-                bio
+                bio,
+                patientData
             },
             {new: true, runValidators: true}
         ).select('-password');

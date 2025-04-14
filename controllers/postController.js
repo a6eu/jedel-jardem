@@ -3,7 +3,7 @@ const User = require('../models/User')
 
 exports.createPost = async (req, res) => {
     try {
-        const {title, description, images} = req.body
+        const {title, description, images, category} = req.body
         const user = await User.findById(req.user.id).select(
             'name specialisation avatarUrl email id'
         )
@@ -14,6 +14,7 @@ exports.createPost = async (req, res) => {
             title,
             description,
             images,
+            category,
             author: req.user.id,
         })
 

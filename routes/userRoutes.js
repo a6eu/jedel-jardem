@@ -3,7 +3,8 @@ const {
     getUsers,
     getUserById,
     updateUser,
-    deleteUser, getMe,
+    deleteUser,
+    getMe,
 } = require('../controllers/userController')
 const authMiddleware = require('../middlewares/authMiddleware')
 
