@@ -21,6 +21,6 @@ router.delete('', authMiddleware, deleteUser)
 
 router.get('/everyone', getUsers)
 
-router.get('/review', authMiddleware, reviewUser)
+router.post('/review', authMiddleware, reviewUser)
 
 module.exports = router
