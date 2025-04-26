@@ -15,13 +15,13 @@ const UserSchema = new mongoose.Schema(
         company: {type: String},
         bio: {type: String},
         patientData: {
-            bloodType: {type: String},
-            weight: {type: String},
-            height: {type: String},
+            bloodType: {type: String, default: ''},
+            weight: {type: String, default: ''},
+            height: {type: String, default: ''},
             illnessHistory: [{
-                type: String
+                type: String, default: ''
             }],
-            allergies: [{type: String}]
+            allergies: [{type: String, default: ''}],
         },
         reviews: [{type: Number}]
     },

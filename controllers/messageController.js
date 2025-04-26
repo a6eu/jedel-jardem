@@ -26,16 +26,17 @@ exports.getChatMessages = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        const messages = await Message.find({chat: req.params.chatId})
-            .populate('sender', 'name');
+        const messages = await Message.find({ chat: req.params.chatId })
+            .populate('sender', 'name')
+            .lean();
 
         const messagesWithIsMine = messages.map(message => ({
-            ...message.toObject(),
-            isMine: message.sender._id.toString() === userId
+            ...message,
+            isMine: message.sender ? message.sender._id.toString() === userId : false,
         }));
 
         res.json(messagesWithIsMine);
     } catch (err) {
-        res.status(500).json({message: 'Server error', error: err.message});
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
