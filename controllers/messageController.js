@@ -27,7 +27,7 @@ exports.getChatMessages = async (req, res) => {
         const userId = req.user.id;
 
         const messages = await Message.find({ chat: req.params.chatId })
-            .populate('sender', 'id')
+            .populate('sender', '_id')
             .lean();
 
         const messagesWithIsMine = messages.map(message => ({
