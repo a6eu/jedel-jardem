@@ -3,103 +3,81 @@ const Chat = require('../models/Chat');
 const fs = require('fs');
 const path = require('path');
 
-exports.sendMessage = async (req, res) => {
-    const { chatId, text } = req.body;
+const uploadDir = path.join(__dirname, '../uploads');
 
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+exports.sendMessage = async (req, res) => {
     try {
-        let files = [];
-        if (req.files && req.files.length > 0) {
-            files = req.files.map(file => ({
-                originalName: file.originalname,
-                mimeType: file.mimetype,
-                size: file.size,
-                path: file.path,
-                filename: file.filename
-            }));
-        }
+        const { chatId, text } = req.body;
+        const files = req.files || [];
+
+        const fileData = files.map(file => ({
+            url: `/api/files/${file.filename}`,
+            mimeType: file.mimetype,
+            originalName: file.originalname,
+            size: file.size
+        }));
 
         const message = await Message.create({
             chat: chatId,
             sender: req.user.id,
             text: text || null,
-            files: files.length > 0 ? files : null,
+            files: fileData.length > 0 ? fileData : null
         });
 
         await Chat.findByIdAndUpdate(chatId, {
-            lastMessage: text || (files.length > 0 ? 'File sent' : '')
+            lastMessage: text || (fileData.length > 0 ? 'File sent' : '')
         });
 
         res.status(201).json(message);
-    } catch (err) {
-        if (req.files && req.files.length > 0) {
-            req.files.forEach(file => {
-                fs.unlink(file.path, () => {});
-            });
-        }
-        res.status(500).json({ message: 'Server error', error: err.message });
+    } catch (error) {
+        console.error('Error sending message:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 exports.getChatMessages = async (req, res) => {
     try {
-        const userId = req.user.id;
-
         const messages = await Message.find({ chat: req.params.chatId })
           .populate('sender', '_id name avatar')
+          .sort({ createdAt: 1 })
           .lean();
 
-        const messagesWithIsMine = messages.map(message => {
-            let files = null;
-            if (message.files && message.files.length > 0) {
-                files = message.files.map(file => {
-                    try {
-                        const filePath = path.join(__dirname, '..', file.path);
-                        const fileData = fs.readFileSync(filePath);
-                        return {
-                            ...file,
-                            base64: fileData.toString('base64'),
-                            url: `/api/files/${file.filename}`
-                        };
-                    } catch (err) {
-                        console.error('Error reading file:', err);
-                        return null;
-                    }
-                }).filter(Boolean);
-            }
-
-            return {
-                ...message,
-                files,
-                isMine: message.sender ? message.sender._id.toString() === userId : false,
-            };
-        });
+        const messagesWithIsMine = messages.map(message => ({
+            ...message,
+            isMine: message.sender._id.toString() === req.user.id
+        }));
 
         res.json(messagesWithIsMine);
-    } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 exports.getFile = async (req, res) => {
     try {
-        const file = await Message.findOne(
-          { 'files.filename': req.params.filename },
-          { 'files.$': 1 }
-        );
+        const filePath = path.join(uploadDir, req.params.filename);
 
-        if (!file || !file.files || file.files.length === 0) {
+        if (!fs.existsSync(filePath)) {
             return res.status(404).json({ message: 'File not found' });
         }
 
-        const fileData = file.files[0];
-        const filePath = path.join(__dirname, '..', fileData.path);
+        const fileData = await Message.findOne({ 'files.url': `/api/files/${req.params.filename}` });
+        if (!fileData) {
+            return res.status(404).json({ message: 'File metadata not found' });
+        }
 
-        res.setHeader('Content-Type', fileData.mimeType);
-        res.setHeader('Content-Disposition', `attachment; filename=${fileData.originalName}`);
+        const file = fileData.files.find(f => f.url === `/api/files/${req.params.filename}`);
+
+        res.setHeader('Content-Type', file.mimeType);
+        res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`);
 
         const fileStream = fs.createReadStream(filePath);
         fileStream.pipe(res);
-    } catch (err) {
-        res.status(500).json({ message: 'Server error', error: err.message });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
