@@ -65,7 +65,7 @@ exports.getFile = async (req, res) => {
             return res.status(404).json({ message: 'File not found' });
         }
 
-        const fileData = await Message.findOne({ 'files.url': `/api/files/${req.params.filename}` });
+        const fileData = await Message.findOne({ 'files.url': `http://jedel-jardem.space/api/files/${req.params.filename}` });
         if (!fileData) {
             return res.status(404).json({ message: 'File metadata not found' });
         }
