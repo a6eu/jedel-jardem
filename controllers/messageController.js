@@ -15,7 +15,7 @@ exports.sendMessage = async (req, res) => {
         const files = req.files || [];
 
         const fileData = files.map(file => ({
-            url: `http://jedel-jardem.space/api/files/${file.filename}`,
+            url: `http://jedel-jardem.space/api/files/${file.originalName}`,
             mimeType: file.mimetype,
             originalName: file.originalname,
             size: file.size
