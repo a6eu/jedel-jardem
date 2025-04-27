@@ -18,6 +18,7 @@ const UserSchema = new mongoose.Schema(
             bloodType: {type: String, default: ''},
             weight: {type: String, default: ''},
             height: {type: String, default: ''},
+            heartBeat: {type: String, default: ''},
             illnessHistory: [{
                 type: String, default: ''
             }],
