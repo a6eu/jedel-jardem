@@ -15,7 +15,7 @@ exports.sendMessage = async (req, res) => {
         const files = req.files || [];
 
         const fileData = files.map(file => ({
-            url: `/api/files/${file.originalname}`, // <<=== only relative path
+            url: `/api/messages/files/${file.originalname}`,
             mimeType: file.mimetype,
             originalName: file.originalname,
             size: file.size
@@ -64,7 +64,7 @@ exports.getFile = async (req, res) => {
             return res.status(404).json({ message: 'File not found' });
         }
 
-        const fullUrl = `http://jedel-jardem.space/api/files/${req.params.filename}`;
+        const fullUrl = `http://jedel-jardem.space/api/messages/files/${req.params.filename}`;
         const fileData = await Message.findOne({ 'files.url': fullUrl });
         if (!fileData) {
             return res.status(404).json({ message: 'File metadata not found' });
