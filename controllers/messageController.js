@@ -14,8 +14,10 @@ exports.sendMessage = async (req, res) => {
         const { chatId, text } = req.body;
         const files = req.files || [];
 
+
+
         const fileData = files.map(file => ({
-            url: `/api/messages/files/${file.originalname}`,
+            url: `/api/messages/files/${file.filename}`,
             mimeType: file.mimetype,
             originalName: file.originalname,
             size: file.size
