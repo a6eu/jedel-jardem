@@ -20,7 +20,10 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: '*',
+        origin: ['http://jedel-jardem.space', 'http://localhost:3000'],
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Content-Type'],
+        credentials: true,
     },
 });
 
