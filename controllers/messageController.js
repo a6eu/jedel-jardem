@@ -64,14 +64,14 @@ exports.getFile = async (req, res) => {
             return res.status(404).json({ message: 'File not found' });
         }
 
-        // Corrected file URL to match exactly
         const fullUrl = `http://jedel-jardem.space/api/files/${req.params.filename}`;
         const fileData = await Message.findOne({ 'files.url': fullUrl });
         if (!fileData) {
             return res.status(404).json({ message: 'File metadata not found' });
         }
 
-        const file = fileData.files.find(f => f.url === fullUrl);
+        const file = fileData.files.find(f => f.url.endsWith(`/api/files/${req.params.filename}`));
+
         if (!file) {
             return res.status(404).json({ message: 'File not associated' });
         }
