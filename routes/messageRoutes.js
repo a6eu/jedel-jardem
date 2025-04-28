@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const messageController = require('../controllers/messageController');
 const auth = require('../middlewares/authMiddleware');
-const multer  = require('../multer')
+const upload  = require('../middlewares/uploadMiddleware');
 
-router.post('/', auth, multer.array('files'), messageController.sendMessage);
+router.post('/', auth, upload.single('files'), messageController.sendMessage);
 router.get('/files/:filename', messageController.getFile);
 router.get('/:chatId', auth, messageController.getChatMessages);
 
