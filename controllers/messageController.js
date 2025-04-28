@@ -56,33 +56,29 @@ exports.getChatMessages = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
 exports.getFile = async (req, res) => {
     try {
-        const filePath = path.join(uploadDir, req.params.filename);
+        const { filename } = req.params;
 
-        if (!fs.existsSync(filePath)) {
+
+        const message = await Message.findOne({ 'files.url': `/api/files/${filename}` });
+
+        if (!message) {
+            return res.status(404).json({ message: 'File not found in any message' });
+        }
+
+        const file = message.files.find(f => f.url === `/api/files/${filename}`);
+
+        if (!file) {
             return res.status(404).json({ message: 'File not found' });
         }
 
-        const fullUrl = `http://jedel-jardem.space/api/messages/files/${req.params.filename}`;
-        const fileData = await Message.findOne({ 'files.url': fullUrl });
-        if (!fileData) {
-            return res.status(404).json({ message: 'File metadata not found' });
-        }
+        const filePath = path.join(__dirname, '..', 'uploads', filename);
 
-        const file = fileData.files.find(f => f.url.endsWith(`/api/files/${req.params.filename}`));
-
-        if (!file) {
-            return res.status(404).json({ message: 'File not associated' });
-        }
-
-        res.setHeader('Content-Type', file.mimeType);
-        res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`);
-
-        const fileStream = fs.createReadStream(filePath);
-        fileStream.pipe(res);
+        res.download(filePath);
     } catch (error) {
-        console.error('Error fetching file:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
