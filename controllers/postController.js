@@ -33,7 +33,7 @@ exports.createPost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find()
-            .populate('author', 'name role avatarUrl id email')
+            .populate('author', 'name role avatarUrl id email gender')
             .sort({createdAt: -1})
         res.json(posts)
     } catch (error) {
