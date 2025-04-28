@@ -11,7 +11,7 @@ if (!fs.existsSync(uploadDir)) {
 exports.sendMessage = async (req, res) => {
     try {
         const { chatId, text } = req.body;
-        const file = req.file; // <-- single file
+        const file = req.file;
 
         let fileData = [];
 
@@ -64,23 +64,13 @@ exports.getChatMessages = async (req, res) => {
 exports.getFile = async (req, res) => {
     try {
         const { filename } = req.params;
-
-
-        const message = await Message.findOne({ 'files.url': `/api/files/${filename}` });
-
-        if (!message) {
-            return res.status(404).json({ message: 'File not found in any message' });
-        }
-
-        const file = message.files.find(f => f.url === `/api/files/${filename}`);
-
-        if (!file) {
-            return res.status(404).json({ message: 'File not found' });
-        }
-
         const filePath = path.join(__dirname, '..', 'uploads', filename);
 
-        res.download(filePath);
+        if (fs.existsSync(filePath)) {
+            res.download(filePath);
+        } else {
+            res.status(404).json({ message: 'File not found' });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
