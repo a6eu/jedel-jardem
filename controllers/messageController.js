@@ -15,7 +15,7 @@ exports.sendMessage = async (req, res) => {
         const files = req.files || [];
 
         const fileData = files.map(file => ({
-            url: `http://jedel-jardem.space/api/files/${file.originalName}`,
+            url: `/api/files/${file.originalname}`, // <<=== only relative path
             mimeType: file.mimetype,
             originalName: file.originalname,
             size: file.size
@@ -56,7 +56,6 @@ exports.getChatMessages = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
-
 exports.getFile = async (req, res) => {
     try {
         const filePath = path.join(uploadDir, req.params.filename);
@@ -65,12 +64,17 @@ exports.getFile = async (req, res) => {
             return res.status(404).json({ message: 'File not found' });
         }
 
-        const fileData = await Message.findOne({ 'files.url': `http://jedel-jardem.space/api/files/${req.params.filename}` });
+        // Corrected file URL to match exactly
+        const fullUrl = `http://jedel-jardem.space/api/files/${req.params.filename}`;
+        const fileData = await Message.findOne({ 'files.url': fullUrl });
         if (!fileData) {
             return res.status(404).json({ message: 'File metadata not found' });
         }
 
-        const file = fileData.files.find(f => f.url === `/api/files/${req.params.filename}`);
+        const file = fileData.files.find(f => f.url === fullUrl);
+        if (!file) {
+            return res.status(404).json({ message: 'File not associated' });
+        }
 
         res.setHeader('Content-Type', file.mimeType);
         res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`);
@@ -78,6 +82,7 @@ exports.getFile = async (req, res) => {
         const fileStream = fs.createReadStream(filePath);
         fileStream.pipe(res);
     } catch (error) {
+        console.error('Error fetching file:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
