@@ -8,20 +8,21 @@ const uploadDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
-
 exports.sendMessage = async (req, res) => {
     try {
         const { chatId, text } = req.body;
-        const files = req.files || [];
+        const file = req.file; // <-- single file
 
+        let fileData = [];
 
-
-        const fileData = files.map(file => ({
-            url: `/api/messages/files/${file.filename}`,
-            mimeType: file.mimetype,
-            originalName: file.originalname,
-            size: file.size
-        }));
+        if (file) {
+            fileData.push({
+                url: `/api/messages/files/${file.filename}`,
+                mimeType: file.mimetype,
+                originalName: file.originalname,
+                size: file.size
+            });
+        }
 
         const message = await Message.create({
             chat: chatId,
@@ -40,6 +41,7 @@ exports.sendMessage = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
 
 exports.getChatMessages = async (req, res) => {
     try {
